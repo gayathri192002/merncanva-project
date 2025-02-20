@@ -1,13 +1,12 @@
 {
-  "name": "canva1",
+  "name": "Canva1",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-  "server": "node server.js",
-  "client": "npm run dev --prefix front1",
-  "client-build":"npm run build --prefix front1"
-
+    "server": "nodemon server.js",
+    "client": "npm run dev --prefix Front1",
+    "start": "node server.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "keywords": [],
   "author": "",
@@ -17,10 +16,14 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "mongoose": "^8.10.1",
-    "nodemon": "^3.1.9"
+    "mongoose": "^8.9.3",
+    "nodemon": "^3.1.9",
+    "react-router-dom": "^7.2.0"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.2",
+    "postcss": "^8.5.2",
+    "tailwindcss": "^4.0.7"
   }
 }
