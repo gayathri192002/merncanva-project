@@ -1,59 +1,51 @@
-const express = require('express');
+const express = require('express')
+const app = express()
+const mongoose = require('mongoose')
+const dotenv = require('dotenv')
+const cors = require('cors')
+const path = require('path')
 
-const mongoose = require('mongoose');
-const cors = require('cors');
-const dotenv=require('dotenv').config();
-const path=require('path');
+dotenv.config()
+app.use(express.json())
+ 
+if (process.env.NODE_ENV === 'local') {
+    app.use(cors({
+        origin: 'http://localhost:5173',
+        credentials: true
+    }))
+} else {
+    app.use(cors({
+        credentials: true
+    }))
+}
+
+app.use('/api', require('./routes/designRoutes'))
+app.use('/api', require('./routes/authRoutes'))
 
 
-const app = express();
-
-// CORS Configuration
-const corsOptions = {
-    origin: process.env.NODE_ENV === 'local' ? 'http://localhost:3000' : '*',
-    credentials: true,
-};
-app.use(cors(corsOptions));
-
-app.use(express.json()); // Middleware to parse JSON requests
-if(process.env.NODE_ENV==='production')
-{
-    app.use(express.static(path.join(__dirname,"./Front1/dist")))
-    app.get('*',(req,res)=>{
-        res.sendFile(path.resolve(__dirname,"./","front1","dist","Index.html"))
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, "./frontend/dist")))
+    app.get('*',(req,res) => {
+        res.sendFile(path.resolve(__dirname, "./", "frontend", "dist","index.html"))
     })
 }
 
-// Database Connection Function
+  
 const dbConnect = async () => {
     try {
-        const dbURI = process.env.NODE_ENV === 'local' ? process.env.LOCAL_DB_URI : process.env.MONGODB_URL;
-
-        if (!dbURI) {
-            throw new Error("❌ Database URI is missing. Check your .env file.");
+        if (process.env.NODE_ENV === 'local') {
+            await mongoose.connect(process.env.LOCAL_DB_URI)
+            console.log('Local Database Is Connected..')
+        } else {
+            await mongoose.connect(process.env.MONGODB_URI)
+            console.log('Production Database Is Connected..')
         }
-
-        console.log(`🔍 Connecting to database: ${dbURI}`);
-
-        await mongoose.connect(dbURI, {
-            useNewUrlParser: true, // ✅ Keep this
-        });
-
-        console.log(`✅ Database connected successfully (${process.env.NODE_ENV})`);
+         
     } catch (error) {
-        console.error('❌ Database connection failed:', error);
-        process.exit(1); // Exit the process if the database fails to connect
+        console.log('Database connection Failed.')
     }
-};
+}
+dbConnect()
 
-
-// Connect to Database
-dbConnect();
-
-// Default Port
-const PORT = process.env.PORT || 5000;
-
-// Start the Server
-app.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}...`);
-});
+const PORT = process.env.PORT
+app.listen(PORT, () => console.log(`Server is runing on port ${PORT}..`))
